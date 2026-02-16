@@ -1,14 +1,14 @@
-const Question = require("../models/Question");
+const Question = require("../models/question");
 
 // Create Question
 exports.createQuestion = async (req, res) => {
   try {
-    const { sessionId, question, category, difficulty } = req.body;
+    const { sessionId, questionText, correctAnswer, difficulty } = req.body;
 
     const newQuestion = await Question.create({
-      sessionId,
-      question,
-      category,
+      session: sessionId,
+      questionText,
+      correctAnswer,
       difficulty,
     });
 
@@ -24,7 +24,7 @@ exports.createQuestion = async (req, res) => {
 // Get Questions by Session
 exports.getQuestionsBySession = async (req, res) => {
   try {
-    const questions = await Question.find({ sessionId: req.params.sessionId });
+    const questions = await Question.find({ session: req.params.sessionId });
 
     res.status(200).json({
       success: true,
@@ -38,11 +38,11 @@ exports.getQuestionsBySession = async (req, res) => {
 // Update Question Answer
 exports.updateQuestionAnswer = async (req, res) => {
   try {
-    const { userAnswer, feedback, score } = req.body;
+    const { userAnswer, explanation, isCorrect } = req.body;
 
     const question = await Question.findByIdAndUpdate(
       req.params.id,
-      { userAnswer, feedback, score },
+      { userAnswer, explanation, isCorrect },
       { new: true }
     );
 

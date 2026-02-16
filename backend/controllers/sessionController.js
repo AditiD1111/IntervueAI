@@ -1,15 +1,14 @@
-const Session = require("../models/Session");
+const Session = require("../models/session");
 
 // Create Session
 exports.createSession = async (req, res) => {
   try {
-    const { title, description, duration } = req.body;
+    const { title, description, topic } = req.body;
 
     const session = await Session.create({
-      userId: req.userId,
+      user: req.userId,
       title,
-      description,
-      duration,
+      topic,
     });
 
     res.status(201).json({
@@ -24,7 +23,7 @@ exports.createSession = async (req, res) => {
 // Get All Sessions for User
 exports.getUserSessions = async (req, res) => {
   try {
-    const sessions = await Session.find({ userId: req.userId });
+    const sessions = await Session.find({ user: req.userId });
 
     res.status(200).json({
       success: true,
@@ -56,7 +55,7 @@ exports.getSessionById = async (req, res) => {
 // Update Session
 exports.updateSession = async (req, res) => {
   try {
-    const { title, description, status, score } = req.body;
+    const { title, topic, status, score } = req.body;
 
     let session = await Session.findById(req.params.id);
 
@@ -66,7 +65,7 @@ exports.updateSession = async (req, res) => {
 
     session = await Session.findByIdAndUpdate(
       req.params.id,
-      { title, description, status, score },
+      { title, topic, status, score },
       { new: true }
     );
 
