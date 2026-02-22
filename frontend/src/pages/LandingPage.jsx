@@ -1,18 +1,41 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import AuthModal from "../components/AuthModal";
+
 
 export default function LandingPage() {
+
+  const [modalType, setModalType] = useState(null);
+
   return (
     <div className="min-h-screen text-white bg-gradient-to-b from-[oklch(39.8%_0.07_227.392)] via-[oklch(29.3%_0.066_243.157)] to-[oklch(28.2%_0.091_267.935)]">
       
       <header className="flex items-center justify-between px-8 py-5 bg-transparent">
         <h1 className="text-3xl font-bold text-[oklch(75%_0.105_223.128)]">InterVue</h1>
         <div className="space-x-4">
-          <button className="px-4 py-2 border border-[oklch(52%_0.105_223.128)] rounded-md hover:bg-[oklch(52%_0.105_223.128)] hover:text-black transition">
-            Login
-          </button>
-          <button className="px-4 py-2 bg-[oklch(50%_0.134_242.749)] rounded-md hover:bg-[oklch(44.3%_0.11_240.79)] transition">
-            Sign Up
-          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setModalType("login")}
+              className="px-4 py-2 
+                        bg-[oklch(50%_0.134_242.749)] 
+                        text-white 
+                        rounded-md 
+                        hover:bg-[oklch(44.3%_0.11_240.79)] 
+                        transition">
+                Login
+            </button>
+            <button
+              onClick={() => setModalType("signup")}
+              className="px-4 py-2 
+                        bg-[oklch(50%_0.134_242.749)] 
+                        text-white 
+                        rounded-md 
+                        hover:bg-[oklch(44.3%_0.11_240.79)] 
+                        transition">
+                          Sign Up
+            </button>
+          </div>
         </div>
       </header>
 
@@ -57,7 +80,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      
+      {modalType && (
+        <AuthModal
+          type={modalType}
+          onClose={() => setModalType(null)}
+        />
+      )}
+     
     </div>
   );
 }
