@@ -3,11 +3,13 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.MONGO_URI);
         console.log(`MongoDB Connected`);
     } catch (error) {
-        console.error("MongoDB connection error:", error);
-        process.exit(1);
+        console.error("MongoDB connection error:", error.message);
+        console.log(
+            "Continuing without MongoDB. Auth and sessions will use local file storage, while chat routes can still work normally."
+        );
     }
 };
 

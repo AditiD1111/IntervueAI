@@ -1,92 +1,86 @@
-import React from "react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import AuthModal from "../components/AuthModal";
+import { useAuth } from "../contexts/AuthContext";
+import BrandLogo from "../components/brand/BrandLogo";
 
+const featureCards = [
+  {
+    title: "Structured Prep",
+    description: "Follow a guided roadmap covering aptitude, DSA, and core CS fundamentals.",
+  },
+  {
+    title: "Coding Practice",
+    description: "Practice interview-level coding questions with clearer, faster revision loops.",
+  },
+  {
+    title: "Interview Ready",
+    description: "Prepare role-specific questions, polished answers, and confident talking points.",
+  },
+];
 
 export default function LandingPage() {
-
-  const [modalType, setModalType] = useState(null);
+  const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen text-white bg-gradient-to-b from-[oklch(39.8%_0.07_227.392)] via-[oklch(29.3%_0.066_243.157)] to-[oklch(28.2%_0.091_267.935)]">
-      
-      <header className="flex items-center justify-between px-8 py-5 bg-transparent">
-        <h1 className="text-3xl font-bold text-[oklch(75%_0.105_223.128)]">InterVue</h1>
-        <div className="space-x-4">
-          <div className="flex gap-4">
-            <button
-              onClick={() => setModalType("login")}
-              className="px-4 py-2 
-                        bg-[oklch(50%_0.134_242.749)] 
-                        text-white 
-                        rounded-md 
-                        hover:bg-[oklch(44.3%_0.11_240.79)] 
-                        transition">
-                Login
-            </button>
-            <button
-              onClick={() => setModalType("signup")}
-              className="px-4 py-2 
-                        bg-[oklch(50%_0.134_242.749)] 
-                        text-white 
-                        rounded-md 
-                        hover:bg-[oklch(44.3%_0.11_240.79)] 
-                        transition">
-                          Sign Up
-            </button>
+    <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.12),_transparent_24%),linear-gradient(180deg,#f8fbff_0%,#eef4fa_42%,#f8fafc_100%)] text-slate-900">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.12),_transparent_26%),radial-gradient(circle_at_80%_18%,_rgba(15,23,42,0.06),_transparent_24%)]" />
+
+      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-10">
+        <header className="flex items-center justify-between">
+          <BrandLogo />
+
+          <div className="flex items-center gap-3">
+            <Link
+              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+              to={isAuthenticated ? "/dashboard" : "/login"}
+            >
+              {isAuthenticated ? "Dashboard" : "Login"}
+            </Link>
+            <Link
+              className="btn-primary rounded-full px-4 py-2 text-sm"
+              to={isAuthenticated ? "/chat" : "/signup"}
+            >
+              {isAuthenticated ? "Open Coach" : "Sign Up"}
+            </Link>
           </div>
-        </div>
-      </header>
+        </header>
 
-     
-      <section className="flex flex-col items-center text-center px-6 py-28">
-        <h2 className="text-3xl md:text-5xl font-extrabold mb-4">
-          Prepare Smart.&nbsp;Crack Interviews.
-        </h2>
-        <p className="max-w-3xl mb-6 text-[oklch(65%_0.105_223.128)]">
-          Get role-specific questions, expand answers when you need them, dive deeper into concepts, and organize everything your way.
-        </p>
-        <p className="max-w-3xl mb-10 text-[oklch(65%_0.105_223.128)]">
-          From preparation to mastery — your ultimate interview toolkit is here.
-        </p>
-        <div className="flex gap-4">
-          <button className="px-6 py-3 rounded-lg font-medium bg-[oklch(50%_0.134_242.749)] hover:bg-[oklch(44.3%_0.11_240.79)] transition">
-            Get Started
-          </button>
-          
-        </div>
-      </section>
+        <section className="flex flex-1 flex-col items-center justify-center px-4 py-20 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.32em] text-sky-600">Interview Platform</p>
+          <h2 className="mt-5 max-w-4xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+            Prepare Smart. Crack Interviews.
+          </h2>
 
-    
-      <section className="max-w-6xl mx-auto px-6 py-16 grid gap-6 md:grid-cols-3">
-        <div className="rounded-xl p-6 text-center bg-[oklch(39.1%_0.09_240.876)] border border-[oklch(45%_0.085_224.283)] backdrop-blur-sm">
-          <h3 className="text-xl font-semibold mb-2"> Structured Prep</h3>
-          <p className="text-sm text-[oklch(52%_0.105_223.128)]">
-            Follow a guided roadmap covering aptitude, DSA, and CS fundamentals.
+          <p className="mt-6 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
+            Get role-specific questions, expand answers when you need them, dive deeper into concepts,
+            and organize everything inside one focused interview workspace.
           </p>
-        </div>
-        <div className="rounded-xl p-6 text-center bg-[oklch(39.1%_0.09_240.876)] border border-[oklch(45%_0.085_224.283)] backdrop-blur-sm">
-          <h3 className="text-xl font-semibold mb-2">Coding Practice</h3>
-          <p className="text-sm text-[oklch(52%_0.105_223.128)]">
-            Solve interview-level coding problems with clear explanations.
-          </p>
-        </div>
-        <div className="rounded-xl p-6 text-center bg-[oklch(39.1%_0.09_240.876)] border border-[oklch(45%_0.085_224.283)] backdrop-blur-sm">
-          <h3 className="text-xl font-semibold mb-2"> Interview Ready</h3>
-          <p className="text-sm text-[oklch(52%_0.105_223.128)]">
-            Get role-specific questions, expand answers, and master concepts with confidence.
-          </p>
-        </div>
-      </section>
 
-      {modalType && (
-        <AuthModal
-          type={modalType}
-          onClose={() => setModalType(null)}
-        />
-      )}
-     
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+            From preparation to mastery, your all-in-one interview toolkit is here.
+          </p>
+
+          <div className="mt-10">
+            <Link
+              className="btn-primary inline-flex items-center justify-center rounded-full px-7 py-3 text-sm"
+              to={isAuthenticated ? "/dashboard" : "/signup"}
+            >
+              Get Started
+            </Link>
+          </div>
+        </section>
+
+        <section className="grid gap-5 pb-10 md:grid-cols-3">
+          {featureCards.map((card) => (
+            <div
+              key={card.title}
+              className="rounded-[28px] border border-slate-200 bg-white px-6 py-7 text-center shadow-[0_18px_50px_rgba(15,23,42,0.06)]"
+            >
+              <h3 className="text-lg font-semibold text-slate-950">{card.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-500">{card.description}</p>
+            </div>
+          ))}
+        </section>
+      </div>
     </div>
   );
 }

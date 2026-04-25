@@ -8,9 +8,9 @@ const { protect } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-// Protected routes
-router.post("/", protect, createQuestion);
-router.get("/session/:sessionId", protect, getQuestionsBySession);
-router.put("/:id", protect, updateQuestionAnswer);
+router.use(protect);
+router.post("/", createQuestion);
+router.get("/session/:sessionId", getQuestionsBySession);
+router.put("/:id", updateQuestionAnswer);
 
 module.exports = router;

@@ -7,21 +7,40 @@ const sessionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    title: {
+    role: {
       type: String,
-      default: "Interview Session",
+      required: true,
+      trim: true,
+      maxlength: 120,
     },
-    topic: {
+    topics: {
       type: String,
+      required: true,
+      trim: true,
+      maxlength: 240,
+    },
+    experience: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 80,
+    },
+    questions: {
+      type: Number,
+      default: 10,
+      min: 1,
+      max: 50,
     },
     status: {
       type: String,
-      enum: ["active", "completed", "paused"],
+      enum: ["draft", "active", "completed"],
       default: "active",
     },
     score: {
       type: Number,
       default: 0,
+      min: 0,
+      max: 100,
     },
   },
   { timestamps: true }

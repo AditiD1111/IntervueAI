@@ -9,10 +9,10 @@ const { protect } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-// Protected routes
-router.post("/", protect, createSession);
-router.get("/", protect, getUserSessions);
-router.get("/:id", protect, getSessionById);
-router.put("/:id", protect, updateSession);
+router.use(protect);
+router.post("/", createSession);
+router.get("/", getUserSessions);
+router.get("/:id", getSessionById);
+router.put("/:id", updateSession);
 
 module.exports = router;

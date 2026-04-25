@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "4d184392-48c8-400b-9e1e-195b21250c00",
+    "name": "Test User",
+    "email": "testuser2@example.com",
+    "password": "$2b$10$/YyVoOPwgupKV5fhl3Pcq.Y8TXPA9egMjE2xGryymcCGvoYuj9Qzq",
+    "profilePicture": null,
+    "createdAt": "2026-04-24T17:50:16.867Z",
+    "updatedAt": "2026-04-24T17:50:16.867Z"
+  },
+  {
+    "_id": "eed80291-0618-4186-9718-0b2938303e0b",
+    "name": "Antara",
+    "email": "antara@example.com",
+    "password": "$2b$10$nv6XEIcO/Mufs2j00bdMAexJ33EcTqyIX8Lz5czabjrkpl2.Ig0c2",
+    "profilePicture": null,
+    "createdAt": "2026-04-24T17:53:14.202Z",
+    "updatedAt": "2026-04-24T17:53:14.202Z"
+  }
+]
