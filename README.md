@@ -7,15 +7,15 @@ IntervueAI is an interview preparation app with a React frontend and an Express 
 - A landing page and placeholder auth pages in the frontend
 - A new chatbot screen at `/chat`
 - Backend API routes for auth, sessions, questions, and AI
-- Ollama-powered endpoints for chatbot replies, question generation, and concept explanations
+- Groq-powered endpoints for chatbot replies, question generation, and concept explanations
 
 ## Environment setup
 
 - Backend variables are listed in `backend/.env.example`
 - Frontend variables are listed in `frontend/.env.example`
 
-## Ollama setup
+## Groq setup
 
-1. Install Ollama for Windows: https://docs.ollama.com/windows
-2. Pull a model, for example: `ollama pull qwen2.5:3b`
-3. Make sure Ollama is running locally on `http://localhost:11434`
+1. Create a free API key at https://console.groq.com
+2. Add `GROQ_API_KEY` and `GROQ_MODEL=llama-3.1-8b-instant` to `backend/.env`
+3. Restart the backend after changing environment variables

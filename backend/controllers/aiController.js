@@ -1,8 +1,33 @@
 const OpenAI = require("openai");
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GROQ_BASE_URL = (
+  process.env.GROQ_BASE_URL || "https://api.groq.com/openai/v1"
+).replace(/\/$/, "");
+const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
+
+const groq = new OpenAI({
+  baseURL: GROQ_BASE_URL,
+  apiKey: GROQ_API_KEY,
 });
+
+const assertGroqConfigured = () => {
+  if (!GROQ_API_KEY) {
+    const error = new Error(
+      "GROQ_API_KEY is not configured. Add it to backend/.env and restart the server."
+    );
+    error.statusCode = 503;
+    throw error;
+  }
+};
+
+const createChatCompletion = (options) => {
+  assertGroqConfigured();
+  return groq.chat.completions.create({
+    model: GROQ_MODEL,
+    ...options,
+  });
+};
 
 const MAX_HISTORY_MESSAGES = 4;
 
@@ -16,9 +41,21 @@ When useful, suggest one follow-up practice question or one next step.
 `;
 
 const parseJsonResponse = (content) => {
+  const trimmed = typeof content === "string" ? content.trim() : "";
+  const codeBlockMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = codeBlockMatch ? codeBlockMatch[1].trim() : trimmed;
+
   try {
-    return JSON.parse(content);
+    return JSON.parse(candidate);
   } catch {
+    const arrayMatch = candidate.match(/\[[\s\S]*\]/);
+    if (arrayMatch) {
+      try {
+        return JSON.parse(arrayMatch[0]);
+      } catch {
+        return null;
+      }
+    }
     return null;
   }
 };
@@ -47,21 +84,20 @@ exports.chatWithCoach = async (req, res, next) => {
       return res.status(400).json({ message: "A message is required" });
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+    const response = await createChatCompletion({
       messages: [
         { role: "system", content: CHATBOT_INSTRUCTIONS.trim() },
         ...history,
         { role: "user", content: latestMessage },
       ],
       temperature: 0.3,
-      max_tokens: 96,
+      max_tokens: 256,
     });
 
     res.status(200).json({
       success: true,
       reply: response.choices?.[0]?.message?.content?.trim() || "",
-      model: "gpt-3.5-turbo",
+      model: GROQ_MODEL,
     });
   } catch (error) {
     next(error);
@@ -82,16 +118,17 @@ exports.generateInterviewQuestions = async (req, res, next) => {
       });
     }
 
-    const prompt = `Generate ${count} interview questions in JSON format for the category ${category} with difficulty ${difficulty}. ` +
-      "Return an array of objects where each object has questionText, correctAnswer, and difficulty. " +
-      "Example output: [{\"questionText\": \"...\", \"correctAnswer\": \"...\", \"difficulty\": \"...\"}]";
+    const prompt =
+      `Generate ${count} interview questions in JSON format for the category ${category} with difficulty ${difficulty}. ` +
+      "Return only a JSON array where each object has questionText, correctAnswer, and difficulty. " +
+      'Example: [{"questionText":"...","correctAnswer":"...","difficulty":"medium"}]';
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+    const response = await createChatCompletion({
       messages: [
         {
           role: "system",
-          content: "You are an assistant that returns interview questions in valid JSON format.",
+          content:
+            "You return interview questions as valid JSON only. No markdown, no commentary, only the JSON array.",
         },
         {
           role: "user",
@@ -109,6 +146,7 @@ exports.generateInterviewQuestions = async (req, res, next) => {
       success: true,
       questions,
       raw: questions.length === 0 ? content : undefined,
+      model: GROQ_MODEL,
     });
   } catch (error) {
     next(error);
@@ -123,8 +161,7 @@ exports.generateConceptExplanation = async (req, res, next) => {
       return res.status(400).json({ message: "A concept is required" });
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+    const response = await createChatCompletion({
       messages: [
         {
           role: "system",
@@ -137,7 +174,7 @@ exports.generateConceptExplanation = async (req, res, next) => {
         },
       ],
       temperature: 0.7,
-      max_tokens: 500,
+      max_tokens: 400,
     });
 
     const explanation = response.choices?.[0]?.message?.content || "";
@@ -145,7 +182,7 @@ exports.generateConceptExplanation = async (req, res, next) => {
     res.status(200).json({
       success: true,
       explanation: explanation.trim(),
-      model: "gpt-3.5-turbo",
+      model: GROQ_MODEL,
     });
   } catch (error) {
     next(error);

@@ -16,5 +16,14 @@
     "profilePicture": null,
     "createdAt": "2026-04-24T17:53:14.202Z",
     "updatedAt": "2026-04-24T17:53:14.202Z"
+  },
+  {
+    "_id": "fd8511ac-8d47-4cb3-bfae-bcc8d470e06d",
+    "name": "harshit",
+    "email": "harshitrue1@gmail.com",
+    "password": "$2b$10$LIvFyy1S46DV.dQASCNu9.HgHiQJmJ3LsLMrBSRg9.kcMHQjyCqli",
+    "profilePicture": null,
+    "createdAt": "2026-05-18T14:19:06.770Z",
+    "updatedAt": "2026-05-18T14:19:06.770Z"
   }
 ]
