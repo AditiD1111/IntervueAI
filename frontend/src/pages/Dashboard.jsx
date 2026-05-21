@@ -7,7 +7,7 @@ import CreateSessionModal from "../components/dashboard/CreateSessionModal";
 import SessionQuestionsModal from "../components/dashboard/SessionQuestionsModal";
 import { apiRequest } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
-import { buildSessionQuestionSet } from "../lib/sessionQuestionSet";
+
 
 const PROGRESS_STORAGE_KEY = "intervueai.questionProgress";
 
@@ -54,6 +54,8 @@ export default function Dashboard() {
   const [formErrors, setFormErrors] = useState({});
   const [questionModalSession, setQuestionModalSession] = useState(null);
   const [questionProgress, setQuestionProgress] = useState(readProgress);
+  const [questionSet, setQuestionSet] = useState([]);
+  const [questionsLoading, setQuestionsLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -92,13 +94,8 @@ export default function Dashboard() {
     ];
   }, [sessions]);
 
-  const questionSet = useMemo(
-    () => (questionModalSession ? buildSessionQuestionSet(questionModalSession) : []),
-    [questionModalSession]
-  );
-
-  const viewedIndexes = questionModalSession
-    ? questionProgress[questionModalSession.id]?.viewedIndexes || []
+  const viewedIds = questionModalSession
+    ? questionProgress[questionModalSession.id]?.viewedIds || []
     : [];
 
   const updateForm = (event) => {
@@ -203,7 +200,7 @@ export default function Dashboard() {
         const updatedSession = await updateSessionRecord(editingSession.id, payload);
         setQuestionProgress((currentProgress) => ({
           ...currentProgress,
-          [editingSession.id]: { viewedIndexes: [] },
+          [editingSession.id]: { viewedIds: [] },
         }));
 
         if (questionModalSession?.id === editingSession.id) {
@@ -234,12 +231,64 @@ export default function Dashboard() {
     navigate(`/chat?session=${session.id}&prompt=${encodeURIComponent(prompt)}`);
   };
 
+  const fetchSessionQuestions = async (session) => {
+    setQuestionsLoading(true);
+    try {
+      const response = await apiRequest(
+        `/api/interview-questions/random?role=${encodeURIComponent(session.role)}&experience=${encodeURIComponent(session.experience)}&topics=${encodeURIComponent(session.topics)}`,
+        { token }
+      );
+      setQuestionSet(response.questions || []);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setQuestionsLoading(false);
+    }
+  };
+
   const handleViewQuestions = (session) => {
     setQuestionModalSession(session);
     setQuestionProgress((currentProgress) => ({
       ...currentProgress,
-      [session.id]: currentProgress[session.id] || { viewedIndexes: [] },
+      [session.id]: currentProgress[session.id] || { viewedIds: [] },
     }));
+    fetchSessionQuestions(session);
+  };
+
+  const handleShuffle = () => {
+    if (questionModalSession) {
+      fetchSessionQuestions(questionModalSession);
+    }
+  };
+
+  const handlePinQuestion = async (questionId) => {
+    try {
+      await apiRequest("/api/interview-questions/pin", {
+        method: "POST",
+        token,
+        body: { questionId },
+      });
+      setQuestionSet((current) =>
+        current.map((q) => (q.id === questionId ? { ...q, isPinned: true } : q))
+      );
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  };
+
+  const handleUnpinQuestion = async (questionId) => {
+    try {
+      await apiRequest("/api/interview-questions/unpin", {
+        method: "POST",
+        token,
+        body: { questionId },
+      });
+      setQuestionSet((current) =>
+        current.map((q) => (q.id === questionId ? { ...q, isPinned: false } : q))
+      );
+    } catch (requestError) {
+      setError(requestError.message);
+    }
   };
 
   const handleEndSession = async (session) => {
@@ -258,24 +307,24 @@ export default function Dashboard() {
     }
   };
 
-  const handleRevealAnswer = async (questionIndex) => {
+  const handleRevealAnswer = async (questionId) => {
     if (!questionModalSession) {
       return;
     }
 
     const sessionId = questionModalSession.id;
-    const existing = questionProgress[sessionId]?.viewedIndexes || [];
+    const existing = questionProgress[sessionId]?.viewedIds || [];
 
-    if (existing.includes(questionIndex)) {
+    if (existing.includes(questionId)) {
       return;
     }
 
-    const nextViewed = [...existing, questionIndex].sort((left, right) => left - right);
+    const nextViewed = [...existing, questionId];
 
     setQuestionProgress((currentProgress) => ({
       ...currentProgress,
       [sessionId]: {
-        viewedIndexes: nextViewed,
+        viewedIds: nextViewed,
       },
     }));
 
@@ -410,7 +459,11 @@ export default function Dashboard() {
 
       <SessionQuestionsModal
         isOpen={Boolean(questionModalSession)}
-        onClose={() => setQuestionModalSession(null)}
+        loading={questionsLoading}
+        onClose={() => {
+          setQuestionModalSession(null);
+          setQuestionSet([]);
+        }}
         onEditSession={() => {
           if (questionModalSession) {
             setQuestionModalSession(null);
@@ -422,10 +475,13 @@ export default function Dashboard() {
             handleEndSession(questionModalSession);
           }
         }}
+        onPin={handlePinQuestion}
         onRevealAnswer={handleRevealAnswer}
+        onShuffle={handleShuffle}
+        onUnpin={handleUnpinQuestion}
         questions={questionSet}
         session={questionModalSession}
-        viewedIndexes={viewedIndexes}
+        viewedIds={viewedIds}
       />
     </DashboardLayout>
   );
