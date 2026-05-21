@@ -29,6 +29,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    pinnedQuestions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "InterviewQuestion",
+      },
+    ],
   },
   { timestamps: true }
 );
